@@ -7,6 +7,8 @@
   },
   "dependencies": {
     "express": "3.4.8",
-    "ejs": "*"
+    "ejs": "*",
+    "bcrypt": "*",
+    "redis": "0.7.2"
   }
 }

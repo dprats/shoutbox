@@ -1,0 +1,8 @@
+<!-- template logic checks if local.messages variable is set. If so, the template cycles through the variable displaying message objects -->
+
+<% if (locals.messages){ %>
+	<% messages.forEach(function(message){ %>
+		<p class='<%= message.type %>'<%= message.string %></p>
+	<% }) %>
+	<% removeMessages() %>
+<% } %>
