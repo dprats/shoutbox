@@ -47,9 +47,6 @@ if ('development' == app.get('env')) {
 // app.get('/', page(Entry.count), entries.list); //p. 220 and 225
 // app.get('/users', user.list);
 
-//routes for api
-//activate entry-adding API in my application
-app.post('/api/entry', entries.submit); 
 
 //routes for registering a new user
 app.get('/register', register.form);
@@ -64,9 +61,13 @@ app.post('/post',
 				validate.required('entry[title]'), //validating middleware, 9.24
 				validate.lengthAbove('entry[title]',4),
 				entries.submit);
+//routes for api
 //placing at end so it does not override other routes like /upload
 app.get('/:page?', page(Entry.count,5), entries.list); 
 app.get('/api/user/:id', api.user);
+//activate entry-adding API in my application
+app.post('/api/entry', entries.submit); 
+app.get('/api/entries/:page?', page(Entry.count), api.entries);
 
 
 http.createServer(app).listen(app.get('port'), function(){
