@@ -16,8 +16,19 @@ exports.user = function(req,res,next){
 
 exports.entries = function(req,res,next){
 	var page = req.page;
+	//fetch entry data
 	Entry.getRange(page.from, page.to, function(err, entries){
 		if (err) return next(err);
-		res.json(entries);
+
+		//content negotiation from 9.30
+		//respond differently based on Accept header value
+		res.format({
+			'application/json': function(){
+				res.send(entries); //JSON response
+			},
+			'application/xml': function(){
+				res.render('entries/xml', {entries: entries});
+			}
+		});
 	});
 };
