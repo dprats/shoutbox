@@ -16,27 +16,11 @@ function User(obj){
 	}
 }
 
-//Saving a user to Redis
 
-// User.prototype.save = function(fn){
-// 	//user already exists
-// 	if (this.id){
-// 		this.update(fn);
-// 		console.log("user %d exists!", this.id);
-// 	} else { //..if user is new
-// 		console.log("creating new user");
-// 		var user = this;
-// 		db.incr('user:ids', function(err,id){ //create unique ID
-// 			if (err) return fn(err);
-// 			user.id = id; //set ID to be saved
-// 			console.log("about to hash password for user.id=%d",user.id);
-// 			user.hashPassword(function(err){ //hash the password
-// 				if (err) return fn(err);
-// 				user.update(fn); //save user properties
-// 			});
-// 		});
-// 	}
-// };
+
+
+
+//Saving a user to Redis
 
 User.prototype.save = function(fn){
   if (this.id) {
@@ -59,7 +43,7 @@ User.prototype.save = function(fn){
 User.prototype.update = function(fn){
 	var user = this;
 	var id = user.id;
-	db.set('user:id' + user.name, id, function(err){
+	db.set('user:id:' + user.name, id, function(err){
 		if (err) return fn(err);
 		//use redis hash to store data
 		db.hmset('user:' + id, user, function(err){
@@ -67,8 +51,6 @@ User.prototype.update = function(fn){
 		});
 	});	
 };
-
-
 
 User.prototype.hashPassword = function(fn){
 	var user = this;
@@ -84,7 +66,10 @@ User.prototype.hashPassword = function(fn){
 	});
 }
 
-//look up user ID by name, listing 9.7
+
+
+
+// look up user ID by name, listing 9.7
 User.getByName = function(name,fn){
 	User.getId(name, function(err,id){
 		if (err) return fn(err);
@@ -110,13 +95,20 @@ User.authenticate = function(name, pass, fn){
 	//get user by username
 	User.getByName(name, function(err,user){
 		if (err) return fn(err);
-		if (!user.id) return fn(); //if user doesnt exist
+		if (!user.id){
+			console.log("user doesnt exist");
+			return fn(); 
+		} //if user doesnt exist
 		//hash the password passed to the function and compare it
 		//to hash in the user object
 		bcrypt.hash(pass, user.salt, function(err,hash){
 			if (err) return fn(err);
 			//if match was foun
-			if (hash== user.pass) return fn(null, user);
+			if (hash == user.pass) {
+				console.log("user authenticated");
+				return fn(null, user);
+			} 
+			console.log("user NOT authenticated");
 			fn(); //perform fn() if hash does not match
 		});
 	});
@@ -133,4 +125,7 @@ arya.save(function(err){
 	if (err) throw err;
 	console.log('user.id=%d saved with user.name=%s', arya.id,arya.name);
 });
+
+
+
 

@@ -1,0 +1,28 @@
+<!-- listing 9.22, form for posting entries -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title><%= title %></title>
+		<link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+	</head>
+	<body>
+		<% include menu %>
+		<h1><%= title %></h1>
+		<p>Fill in the form below to add a new post.</p>
+
+		<% include messages %>
+
+		<form action='/post' method='post'>
+			<p>
+				<input type='text' name='entry[title]' placeholder='Title' />
+			</p> 
+			<p>
+				<input type='text' name='entry[body]' placeholder='Body' />
+			</p> 
+			<p>
+				<input type='submit' value='Post' />
+			</p> 
+		</form>
+		
+	</body>
+</html>

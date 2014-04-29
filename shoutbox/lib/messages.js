@@ -12,7 +12,7 @@ var res = express.response; //adding properties to this object
 res.message = function(msg, type){
 	type = type || 'info';
 	var sess = this.req.session;
-	sess.messages = sess.messages || {};
+	sess.messages = sess.messages || [];
 	sess.messages.push({type: type, string: msg});
 }
 
@@ -21,4 +21,12 @@ res.error = function(msg){
 }
 
 //exporting the middleware I need to expose these messages
-//to the templates for output
+//to the templates for output (p.212)
+
+module.exports = function(req,res,next){
+	res.locals.messages = req.session.messages || [];
+	res.locals.removeMessages = function(){
+		req.session.messages = [];
+	}
+	next();
+}
