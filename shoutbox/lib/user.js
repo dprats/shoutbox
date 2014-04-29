@@ -5,6 +5,8 @@ var db = redis.createClient(); //create redis connection
 
 //exporting the "User" function from the module
 module.exports = User;
+
+
 //User function accepts an object and merges this
 //object's properties into its own
 
@@ -114,6 +116,12 @@ User.authenticate = function(name, pass, fn){
 	});
 };
 
+User.prototype.toJSON = function(){
+	return {
+		id: this.id,
+		name: this.name
+	}
+};
 
 var arya = new User({
 	name: 'Arya',

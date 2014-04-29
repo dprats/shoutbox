@@ -13,19 +13,6 @@ exports.list = function(req,res,next){
 	});
 };
 
-//CLONE
-
-// exports.list = function(req, res, next){
-//   var page = req.page;
-//   Entry.getRange(page.from, page.to, function(err, entries) {
-//     if (err) return next(err);
-
-//     res.render('entries', {
-//       title: 'Entries',
-//       entries: entries,
-//     });
-//   });
-// };
 
 //form for posting an entry
 exports.form = function(req,res){
@@ -34,8 +21,8 @@ exports.form = function(req,res){
 
 //logic for submitting entries, listing 9.23
 exports.submit = function(req,res,next){
+	console.log("Submit=%s", req.body);
 	var data = req.body.entry;
-
 	var entry = new Entry({
 		"username": res.locals.user.name,
 		"title": data.title,
@@ -43,8 +30,14 @@ exports.submit = function(req,res,next){
 	});
 
 	entry.save(function(err){
-		if(err) return fn(err);
+		if (err) return next(err);
+		if (req.remoteUser) {
+			console.log('entry added for remote user');
+			res.json({message: 'Entry Added.'});
+		}
 		console.log("             entry saved");
 		res.redirect('/');
 	});
 };
+
+

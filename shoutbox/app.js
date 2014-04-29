@@ -16,6 +16,7 @@ var entries = require('./routes/entries');
 var validate = require('./lib/middleware/validate'); //p225
 var page = require('./lib/middleware/page'); 
 var Entry = require('./lib/entry');
+var api = require('./routes/api');
 
 var app = express();
 
@@ -25,15 +26,17 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.favicon());
 app.use(express.logger('dev'));
-app.use(express.json());
+app.use(express.bodyParser()); //added bodyParser so POST request via API works
+app.use(express.json());			
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
 app.use(express.session());
-
-app.use(messages);
 app.use(express.static(path.join(__dirname, 'public')));
+//api middleware should be before user-loading middleware
+app.use('/api', api.auth);
 app.use(user);
+app.use(messages);
 app.use(app.router);
 
 // development only
@@ -43,6 +46,11 @@ if ('development' == app.get('env')) {
 
 // app.get('/', page(Entry.count), entries.list); //p. 220 and 225
 // app.get('/users', user.list);
+
+//routes for api
+//activate entry-adding API in my application
+app.post('/api/entry', entries.submit); 
+
 //routes for registering a new user
 app.get('/register', register.form);
 app.post('/register', register.submit);
@@ -56,8 +64,9 @@ app.post('/post',
 				validate.required('entry[title]'), //validating middleware, 9.24
 				validate.lengthAbove('entry[title]',4),
 				entries.submit);
-////placing at end so it does not override other routes like /upload
+//placing at end so it does not override other routes like /upload
 app.get('/:page?', page(Entry.count,5), entries.list); 
+app.get('/api/user/:id', api.user);
 
 
 http.createServer(app).listen(app.get('port'), function(){
